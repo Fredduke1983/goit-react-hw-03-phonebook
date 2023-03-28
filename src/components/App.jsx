@@ -22,6 +22,19 @@ class App extends Component {
     });
   }
 
+  componentDidMount() {
+    if (localStorage.getItem('key')) {
+      const storage = JSON.parse(localStorage.getItem('key'));
+      return this.setState({ contacts: [...storage] });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.contacts.length !== prevState.contacts.length) {
+      localStorage.setItem('key', JSON.stringify(this.state.contacts));
+    }
+  }
+
   onSubmit = e => {
     e.preventDefault();
     if (
@@ -58,13 +71,10 @@ class App extends Component {
 
   onDeleteContact = e => {
     this.setState(prev => {
-      const indexFindContact = prev.contacts.findIndex(
-        el => el.id === e.target.id
-      );
-      prev.contacts.splice(indexFindContact, 1);
-      return {
-        contacts: [...prev.contacts],
-      };
+      const contactsAfterDelete = prev.contacts.filter(({ id }) => {
+        return id !== e.target.id;
+      });
+      return { contacts: [...contactsAfterDelete] };
     });
   };
 
